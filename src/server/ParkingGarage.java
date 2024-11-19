@@ -28,7 +28,8 @@ public class ParkingGarage {
 		this.feeRate = rate;
 		this.activeTransactions = 0;
 		this.numOfTransactions = 0;
-		 
+		
+		// Create initial list of transactions
 		transactionList = new ParkingTransactions[10];
 
 	}
