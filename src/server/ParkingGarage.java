@@ -7,7 +7,10 @@ public class ParkingGarage {
 	static private int count = 0;      // Use for garage ID
 	
 	// All class attributes
+	/**
 	private int garageID;
+	*/
+	private String garageID;
 	private int totalSpaces;
 	private int occupiedSpaces;
 	private double feeRate;
@@ -19,9 +22,12 @@ public class ParkingGarage {
 	private ParkingTransaction[] transactionList;
 
 	
-	public ParkingGarage(double rate, int spaceNum){
+	public ParkingGarage(String id, double rate, int spaceNum){
 		
+		/**
 		this.garageID = count + 1;
+		*/
+		this.garageID = id;
 		this.totalSpaces = spaceNum;
 		this.availableSpaces = spaceNum;
 		this.occupiedSpaces = 0;
