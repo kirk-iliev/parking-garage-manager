@@ -8,43 +8,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDateTime; // import the LocalDate class
 
 public class ClientGUI {
 public static void main(String[] args) throws IOException, ClassNotFoundException {
 		
-		/**
-		Scanner sc= new Scanner(System.in); //System.in is a standard input stream.
-
-	    // Request port and host from user
-	    System.out.print("Enter the port number to connect to: <7777> ");
-	    int port = sc.nextInt();
-	    sc.nextLine();
-	    System.out.print("Enter the host address to connect to: <localhost> ");
-	    String host = sc.nextLine();
-	    
-	    // Connect to the ServerSocket at host:port
-	    Socket socket = new Socket(host, port);
-	    System.out.println("Connected to " + host + ":" + port);
-	    
-	    
-	    // create a input and output so we can read and send data
-	    ObjectOutputStream objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-	    ObjectInputStream objectInputStream = new ObjectInputStream(socket.getInputStream());
-	    
-	    
-	    // Send login message
-	    Message loginMsg = new Message("Login");
-	    objectOutputStream.writeObject(loginMsg);
-	    
-	    // Check for success message and print to user
-	    Message inputMsg = (Message)objectInputStream.readObject();
-	    printMessage(inputMsg);
-	    */
 	    
 	    
 		String[] commands = {"Park Car",
 				 	"Remove Car",
-				 	"Access Record",
+				 	"Generate Report",
 				 	"Show Ticket Info",
 				 	"Last Button",
 				 	"Close"};
@@ -64,7 +37,7 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
 			 switch (choice) {
 			 	case 0: doParkCar(); break;
 			 	case 1: doRemoveCar(); break;
-			 	case 2: doAccessRecord(); break;
+			 	case 2: doGenerateReport(); break;
 			 	case 3: doShowTicketInfo(); break;
 			 	case 4: doLastButton(); break;
 			 	case 5: doClose(); break;
@@ -73,13 +46,7 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
 			 
 		 } while (choice != commands.length-1);
 		 System.exit(0);
-		 
-		 /**
-		 objectInputStream.close();
-		 objectOutputStream.close();
-		 sc.close();
-		 socket.close();
-		 */
+		
 	}
 
 	 
@@ -88,72 +55,44 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
 private static void doParkCar() {
 
 	// Request the title
-	String title = JOptionPane.showInputDialog("\n\nEnter Car Info");
+	String parkID = JOptionPane.showInputDialog("Enter Car Info");
 	
-	
-   
-           
     // Display current collection to the console for debugging
     JOptionPane.showMessageDialog(null,"Car Parked;");
 }
 
 private static void doRemoveCar() {
 
-	// Request the title
-
-	String title = JOptionPane.showInputDialog("Enter title");
-	if (title == null) {
-		return;		// dialog was cancelled
-	}
-	title = title.toUpperCase();
+	// Request parking ticket info
+	String ticketID = JOptionPane.showInputDialog("Enter transaction ID");
 	
-           // Remove the matching DVD if found
-           
-           
-           // Display current collection to the console for debugging
-           JOptionPane.showMessageDialog(null, "Removing " + title + "\n");
+	// Convert string to integer
+	int intID=Integer.parseInt(ticketID); 
+	
+	// Display fee
+	double parkingFee = 0;
+	
+	
+    JOptionPane.showMessageDialog(null, parkingFee);
 }
 
-private static void doAccessRecord() {
+private static void doGenerateReport() {
 
-	// Request the title
-	String title = JOptionPane.showInputDialog("\n\nEnter Title");
-	if (title == null) {
-		return;		// dialog was cancelled
-	}
-	title = title.toUpperCase();
-	
-	String info = "null";
-	
-	// String to hold image file name
-	String imageLoad = title.replaceAll("\\s", "");
-	imageLoad = imageLoad + ".jpg";
-	
-	/**
-	ImageIcon icon = new ImageIcon(ClientGUI.class.getResource(imageLoad));
-    JOptionPane.showMessageDialog(
-           null,
-           info,
-           "DVD", JOptionPane.INFORMATION_MESSAGE,
-           icon);
-           */
+	// Return parking garage records
+	String recordsList = null;
+	JOptionPane.showMessageDialog(null, recordsList);
 
 }
 
 
 private static void doShowTicketInfo() {
 
-	// Request the rating
-	String rating = JOptionPane.showInputDialog("Enter rating");
-	if (rating == null) {
-		return;		// dialog was cancelled
-	}
-	rating = rating.toUpperCase();
+	// Request parking ticket info
+	String ticketID = JOptionPane.showInputDialog("Enter transaction ID");
 	
-           String results = "null";
-           
-           JOptionPane.showMessageDialog(null, "DVDs with rating " + rating + results );
-
+	// Convert string to integer
+	int intID=Integer.parseInt(ticketID); 
+	
 }
 
 
@@ -162,20 +101,15 @@ private static void doLastButton() {
    // Print total running time
    
    	
-   JOptionPane.showMessageDialog(null, "Total Running Time of DVDs");
+   JOptionPane.showMessageDialog(null, "test");
 }
 
 
 private static void doClose() {
-	// Display current collection to the console for debugging
+	
+	// Prompt user the program is closing
 	   JOptionPane.showMessageDialog(null,"Closing Program");
 	
 }	
-	
-
-private static void printMessage(Message msg){
-    System.out.println("\nStatus: " + msg.getStatus());
-    System.out.println("Text: " + msg.getText());
-}
 
 }

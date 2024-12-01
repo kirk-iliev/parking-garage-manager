@@ -36,18 +36,15 @@ public class ParkingGarage {
 		this.numOfTransactions = 0;
 		
 		// Create initial list of transactions
-		transactionList = new ParkingTransaction[10];
+		transactionList = new ParkingTransaction[100];
 
 	}
 	
 	public void parkCar() {
 		
-		// Need programming if transaction list is full	
-		String test = "T1";
-		
 		this.numOfTransactions++;
 		LocalDateTime currentTime = LocalDateTime.now();
-		transactionList[numOfTransactions-1] = new ParkingTransaction(test, currentTime);
+		transactionList[numOfTransactions-1] = new ParkingTransaction(numOfTransactions, currentTime);
 		this.occupiedSpaces++;
 		this.availableSpaces--;
 	}
@@ -83,6 +80,17 @@ public class ParkingGarage {
 	public double getFeeRate() {
 		return this.feeRate;
 		
+	}
+	
+	public String displayTransactions() {
+		
+		String displayString = null;
+		for (int i = 0; i < this.numOfTransactions; i++) {
+			displayString = transactionList[i].getTransactionDetails();
+			displayString = displayString + "\n";
+		}
+		
+		return displayString;
 	}
 
 }

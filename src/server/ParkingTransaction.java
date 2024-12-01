@@ -4,13 +4,13 @@ import java.time.format.DateTimeFormatter;
 
 public class ParkingTransaction {
 	
-    private String transactionID;
+    private int transactionID;
     private LocalDateTime entryTime;
     private LocalDateTime exitTime;
     private double fee;
     private boolean isActive;
 
-    public ParkingTransaction(String transactionID, LocalDateTime entryTime) {
+    public ParkingTransaction(int transactionID, LocalDateTime entryTime) {
         this.transactionID = transactionID;
         this.entryTime = entryTime;
         this.isActive = true; 
@@ -58,7 +58,7 @@ public class ParkingTransaction {
         return details.toString();
     }
 
-    public String getTransactionID() {
+    public int getTransactionID() {
         return transactionID;
     }
 
