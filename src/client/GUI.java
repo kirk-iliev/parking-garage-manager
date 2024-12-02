@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.time.LocalDateTime; // import the LocalDate class
 
-public class ClientGUI {
+public class GUI {
 public static void main(String[] args) throws IOException, ClassNotFoundException {
 		
 	    
@@ -27,7 +27,7 @@ public static void main(String[] args) throws IOException, ClassNotFoundExceptio
 		 do {
 			 choice = JOptionPane.showOptionDialog(null,
 					 "Select a command", 
-					 "DVD Collection",
+					 "Parking Garage",
 					 JOptionPane.YES_NO_CANCEL_OPTION, 
 					 JOptionPane.QUESTION_MESSAGE, 
 					 null, 
@@ -109,6 +109,34 @@ private static void doClose() {
 	
 	// Prompt user the program is closing
 	   JOptionPane.showMessageDialog(null,"Closing Program");
+	
+}	
+
+public void displayError(String string) {
+	
+	// display Error message
+	   JOptionPane.showMessageDialog(null,string);
+	
+}	
+
+public void updateStatus(String string) {
+	
+	// display status of connections
+	   JOptionPane.showMessageDialog(null,string);
+	
+}	
+
+public void displayMessage(String string) {
+	
+	// display message
+	   JOptionPane.showMessageDialog(null,string);
+	
+}	
+
+public void displayReport(String string) {
+	
+	// display message
+	   JOptionPane.showMessageDialog(null,string);
 	
 }	
 
