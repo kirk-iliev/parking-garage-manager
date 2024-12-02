@@ -140,4 +140,39 @@ public void displayReport(String string) {
 	
 }	
 
+public String getEntryTimeInput() {
+	
+	// Return Entry Time
+	String temp = null;
+	
+	return temp;
+}	
+
+public String getGarageIDInput(){
+	
+	// Return Entry Time
+	String temp = null;
+		
+	return temp;
+	
+}
+
+public String getTransactionIDInput(){
+	
+	// Return Entry Time
+	String temp = null;
+		
+	return temp;
+	
+}
+
+public String getExitTimeInput(){
+	
+	// Return Entry Time
+	String temp = null;
+		
+	return temp;
+	
+}
+
 }
