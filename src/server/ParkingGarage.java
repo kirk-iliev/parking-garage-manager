@@ -1,10 +1,4 @@
-// import java.io.*;
-// import java.util.Scanner;
-import java.time.LocalDateTime; // import the LocalDate class
-
 public class ParkingGarage {
-	
-	//static private int count = 0;      // Use for garage ID
 	
 	// All class attributes
 	private int garageID;
@@ -29,24 +23,25 @@ public class ParkingGarage {
 		this.numOfTransactions = 0;
 	
 		// Create initial list of transactions
-		transactionList = new ParkingTransaction[10];
+		transactionList = new ParkingTransaction[100];
 	}
 	
 	
-	public String parkCar(LocalDateTime entryTime) {
+	public String parkCar(long entryTimeMillis) {
 		if (numOfTransactions >= transactionList.length) {
 			System.err.println("Transaction list is full.");
 			return null; // Handle full transaction list
 		}
 		String transactionID = "T" + (numOfTransactions + 1);
-		transactionList[numOfTransactions] = new ParkingTransaction(transactionID, entryTime);
+		transactionList[numOfTransactions] = new ParkingTransaction(transactionID, entryTimeMillis);
 		numOfTransactions++;
 		occupiedSpaces++;
 		availableSpaces--;
 		return transactionID;
 	}
 	
-	public boolean removeCar(String transactionID, LocalDateTime exitTime) {
+	
+	public boolean removeCar(String transactionID, long exitTimeMillis) {
 		for (int i = 0; i < numOfTransactions; i++) {
 			ParkingTransaction transaction = transactionList[i];
 			if (transaction != null && transaction.getTransactionID().equals(transactionID)) {
@@ -54,7 +49,7 @@ public class ParkingGarage {
 					System.err.println("Transaction is already completed.");
 					return false;
 				}
-				transaction.completeTransaction(exitTime, feeRate);
+				transaction.completeTransaction(exitTimeMillis, feeRate);
 				occupiedSpaces--;
 				availableSpaces++;
 				return true;
@@ -63,6 +58,7 @@ public class ParkingGarage {
 		System.err.println("Transaction ID not found.");
 		return false;
 	}
+	
 	
 	public int getTotalSpaces() {
 		return this.totalSpaces;

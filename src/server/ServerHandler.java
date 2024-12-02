@@ -1,8 +1,5 @@
 import java.io.*;
 import java.net.*;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 
 public class ServerHandler {
@@ -108,69 +105,15 @@ public class ServerHandler {
 
     // Handle 'PARK_CAR' request
     private void handleParkCarRequest(String[] parts, PrintWriter output) {
-    try {
-        String entryTimeStr = parts[1];
-        String garageID = parts[2];
-        LocalDateTime entryTime = LocalDateTime.ofEpochSecond(Long.parseLong(entryTimeStr) / 1000, 0, ZoneOffset.UTC);
-        ParkingGarage garage = getGarageByID(garageID);
-
-        if (garage != null) {
-            String transactionID = garage.parkCar(entryTime);
-            if (transactionID != null) {
-                output.println("PARK_CAR_SUCCESS:" + transactionID);
-            } else {
-                output.println("ERROR:Transaction list is full.");
-            }
-        } else {
-            output.println("ERROR:Garage not found");
-        }
-    } catch (Exception e) {
-        output.println("ERROR:" + e.getMessage());
-    }
-}
-
-
-    // Handle 'REMOVE_CAR' request
-    private void handleRemoveCarRequest(String[] parts, PrintWriter output) {
-    try {
-        String transactionID = parts[1];
-        String exitTimeStr = parts[2];
-        String garageID = parts[3];
-        Date exitTimeDate = new Date(Long.parseLong(exitTimeStr));
-        LocalDateTime exitTime = exitTimeDate.toInstant()
-                                             .atZone(ZoneId.systemDefault())
-                                             .toLocalDateTime();
-
-        ParkingGarage garage = getGarageByID(garageID);
-
-        if (garage != null) {
-            boolean success = garage.removeCar(transactionID, exitTime);
-            if (success) {
-                ParkingTransaction transaction = garage.getTransaction(transactionID);
-                double fee = transaction.getFee();
-                output.println("REMOVE_CAR_SUCCESS:" + fee);
-            } else {
-                output.println("ERROR:Transaction not found or already completed");
-            }
-        } else {
-            output.println("ERROR:Garage not found");
-        }
-    } catch (Exception e) {
-        output.println("ERROR:" + e.getMessage());
-    }
-}
-
-
-    // Handle 'GENERATE_REPORT' request
-    private void handleGenerateReportRequest(String[] parts, PrintWriter output) {
         try {
-            String garageID = parts[1];
+            String entryTimeStr = parts[1];
+            String garageID = parts[2];
+            long entryTimeMillis = Long.parseLong(entryTimeStr);
+    
             ParkingGarage garage = getGarageByID(garageID);
-
             if (garage != null) {
-                ReportGenerator reportGenerator = new ReportGenerator();
-                String report = reportGenerator.generateReport(garage);
-                output.println("REPORT_DATA:" + report);
+                String transactionID = garage.parkCar(entryTimeMillis);
+                output.println("PARK_CAR_SUCCESS:" + transactionID);
             } else {
                 output.println("ERROR:Garage not found");
             }
@@ -178,6 +121,60 @@ public class ServerHandler {
             output.println("ERROR:" + e.getMessage());
         }
     }
+    
+
+
+    // Handle 'REMOVE_CAR' request
+    private void handleRemoveCarRequest(String[] parts, PrintWriter output) {
+        try {
+            String transactionID = parts[1];
+            String exitTimeStr = parts[2];
+            String garageID = parts[3];
+            long exitTimeMillis = Long.parseLong(exitTimeStr);
+    
+            ParkingGarage garage = getGarageByID(garageID);
+            if (garage != null) {
+                boolean success = garage.removeCar(transactionID, exitTimeMillis);
+                if (success) {
+                    ParkingTransaction transaction = garage.getTransaction(transactionID);
+                    double fee = transaction.getFee();
+                    output.println("REMOVE_CAR_SUCCESS:" + fee);
+                } else {
+                    output.println("ERROR:Transaction not found or already completed");
+                }
+            } else {
+                output.println("ERROR:Garage not found");
+            }
+        } catch (Exception e) {
+            output.println("ERROR:" + e.getMessage());
+        }
+    }
+    
+
+
+    // Handle 'GENERATE_REPORT' request
+    private void handleGenerateReportRequest(String[] parts, PrintWriter output) {
+        try {
+            String garageID = parts[1];
+            ParkingGarage garage = getGarageByID(garageID);
+    
+            if (garage != null) {
+                ReportGenerator reportGenerator = new ReportGenerator();
+                String report = reportGenerator.generateReport(garage);
+                System.out.println("Generated Report: " + report); // Debugging
+                output.println(report); // Send the report
+                output.println("END_REPORT"); // End marker
+                output.flush();
+            } else {
+                output.println("ERROR:Garage not found");
+                output.flush();
+            }
+        } catch (Exception e) {
+            output.println("ERROR:" + e.getMessage());
+            output.flush();
+        }
+    }
+    
 
     // Retrieve a ParkingGarage by ID
     private ParkingGarage getGarageByID(String garageID) {
