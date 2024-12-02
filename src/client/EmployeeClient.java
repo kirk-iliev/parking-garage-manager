@@ -1,11 +1,13 @@
 import java.io.*;
 import java.net.*;
-import javax.swing.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class EmployeeClient {
 
     // Attributes
-    private GUI gui;
+    private ClientGUI gui;
     private Socket socket;
     private BufferedReader input;
     private PrintWriter output;
@@ -16,7 +18,7 @@ public class EmployeeClient {
     public EmployeeClient(String serverAddress, int serverPort) {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
-        this.gui = new GUI(this);
+        this.gui = new ClientGUI(this);
         connectToServer();
     }
 
@@ -24,9 +26,7 @@ public class EmployeeClient {
     public void connectToServer() {
         try {
             socket = new Socket(serverAddress, serverPort);
-            input = new BufferedReader(
-                new InputStreamReader(socket.getInputStream())
-            );
+            input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
             gui.updateStatus("Connected to server");
         } catch (IOException e) {
@@ -36,6 +36,10 @@ public class EmployeeClient {
 
     // Send a request to the server
     public void sendRequest(String request) {
+        if (socket == null || socket.isClosed()) {
+            gui.displayError("Not connected to the server.");
+            return;
+        }
         output.println(request);
     }
 
@@ -43,6 +47,10 @@ public class EmployeeClient {
     public void receiveResponse() {
         try {
             String response = input.readLine();
+            if (response == null) {
+                gui.displayError("No response from server.");
+                return;
+            }
             processResponse(response);
         } catch (IOException e) {
             gui.displayError("Failed to receive response: " + e.getMessage());
@@ -51,42 +59,33 @@ public class EmployeeClient {
 
     // Process the server's response
     public void processResponse(String response) {
-        if (response == null) {
-            gui.displayError("No response received from server.");
-            return;
-        }
-
         String[] parts = response.split(":");
         String responseType = parts[0];
 
         switch (responseType) {
             case "PARK_CAR_SUCCESS":
-                String transactionID = parts[1];
-                gui.displayMessage("Car parked successfully. Transaction ID: " + transactionID);
+                gui.displayMessage("Car parked successfully. Transaction ID: " + parts[1]);
                 break;
             case "REMOVE_CAR_SUCCESS":
-                String fee = parts[1];
-                gui.displayMessage("Car removed. Parking fee: $" + fee);
+                gui.displayMessage("Car removed successfully. Parking fee: $" + parts[1]);
                 break;
             case "REPORT_DATA":
-                String report = parts[1];
-                gui.displayReport(report);
+                gui.displayReport(parts[1]);
                 break;
             case "ERROR":
-                String errorMessage = parts[1];
-                gui.displayError(errorMessage);
+                gui.displayError(parts[1]);
                 break;
             default:
-                gui.displayError("Unknown response from server.");
+                gui.displayError("Unknown response type: " + responseType);
         }
     }
 
     // Disconnect from the server
     public void disconnect() {
         try {
-            socket.close();
-            input.close();
-            output.close();
+            if (socket != null) socket.close();
+            if (input != null) input.close();
+            if (output != null) output.close();
             gui.updateStatus("Disconnected from server");
         } catch (IOException e) {
             gui.displayError("Error during disconnection: " + e.getMessage());
@@ -95,54 +94,76 @@ public class EmployeeClient {
 
     // Handle 'Park Car' action from GUI
     public void handleParkCar() {
-        String entryTimeStr = gui.getEntryTimeInput();
-        String garageID = gui.getGarageIDInput();
+        try {
+            String entryTimeStr = gui.getEntryTimeInput();
+            String garageID = gui.getGarageIDInput();
 
-        // Convert entry time to milliseconds since epoch
-        long entryTimeMillis = parseTime(entryTimeStr);
-        if (entryTimeMillis == -1) {
+            if (entryTimeStr.isEmpty() || garageID.isEmpty()) {
+                gui.displayError("Entry Time and Garage ID are required.");
+                return;
+            }
+
+            long entryTimeMillis = parseTime(entryTimeStr);
+            String request = "PARK_CAR:" + entryTimeMillis + ":" + garageID;
+            sendRequest(request);
+            receiveResponse();
+        } catch (ParseException e) {
             gui.displayError("Invalid entry time format.");
-            return;
+        } catch (Exception e) {
+            gui.displayError("Error handling 'Park Car': " + e.getMessage());
         }
-
-        String request = "PARK_CAR:" + entryTimeMillis + ":" + garageID;
-        sendRequest(request);
-        receiveResponse();
     }
 
     // Handle 'Remove Car' action from GUI
     public void handleRemoveCar() {
-        String transactionID = gui.getTransactionIDInput();
-        String exitTimeStr = gui.getExitTimeInput();
-        String garageID = gui.getGarageIDInput();
+        try {
+            String transactionID = gui.getTransactionIDInput();
+            String exitTimeStr = gui.getExitTimeInput();
+            String garageID = gui.getGarageIDInput();
 
-        long exitTimeMillis = parseTime(exitTimeStr);
-        if (exitTimeMillis == -1) {
+            if (transactionID.isEmpty() || exitTimeStr.isEmpty() || garageID.isEmpty()) {
+                gui.displayError("Transaction ID, Exit Time, and Garage ID are required.");
+                return;
+            }
+
+            long exitTimeMillis = parseTime(exitTimeStr);
+            String request = "REMOVE_CAR:" + transactionID + ":" + exitTimeMillis + ":" + garageID;
+            sendRequest(request);
+            receiveResponse();
+        } catch (ParseException e) {
             gui.displayError("Invalid exit time format.");
-            return;
+        } catch (Exception e) {
+            gui.displayError("Error handling 'Remove Car': " + e.getMessage());
         }
-
-        String request = "REMOVE_CAR:" + transactionID + ":" + exitTimeMillis + ":" + garageID;
-        sendRequest(request);
-        receiveResponse();
     }
 
     // Handle 'Generate Report' action from GUI
     public void handleGenerateReport() {
-        String garageID = gui.getGarageIDInput();
-        String request = "GENERATE_REPORT:" + garageID;
-        sendRequest(request);
-        receiveResponse();
+        try {
+            String garageID = gui.getGarageIDInput();
+
+            if (garageID.isEmpty()) {
+                gui.displayError("Garage ID is required.");
+                return;
+            }
+
+            String request = "GENERATE_REPORT:" + garageID;
+            sendRequest(request);
+            receiveResponse();
+        } catch (Exception e) {
+            gui.displayError("Error handling 'Generate Report': " + e.getMessage());
+        }
     }
 
     // Parse time from string to milliseconds
-    private long parseTime(String timeStr) {
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-            Date date = sdf.parse(timeStr);
-            return date.getTime();
-        } catch (ParseException e) {
-            return -1;
-        }
+    private long parseTime(String timeStr) throws ParseException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        Date date = sdf.parse(timeStr);
+        return date.getTime();
+    }
+
+    public static void main(String[] args) {
+        EmployeeClient client = new EmployeeClient("localhost", 12345);
+        client.gui.setVisible(true); // Show the GUI
     }
 }
