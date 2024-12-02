@@ -29,7 +29,8 @@ public class ParkingTransaction {
 
     public double calculateFee(double feeRate) {
         long duration = getDuration(); 
-        return Math.ceil(duration / 60.0) * feeRate; 
+        // return Math.ceil(duration / 60.0) * feeRate;
+        return (duration / 60.0) * feeRate;
     }
 
     public long getDuration() {

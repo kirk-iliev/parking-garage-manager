@@ -29,7 +29,7 @@ public class ParkingGarage {
 		this.numOfTransactions = 0;
 	
 		// Create initial list of transactions
-		transactionList = new ParkingTransaction[10];
+		transactionList = new ParkingTransaction[100];
 	}
 	
 	
