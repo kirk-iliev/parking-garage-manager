@@ -1,23 +1,26 @@
-import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class ParkingTransaction {
-	
+
     private String transactionID;
-    private LocalDateTime entryTime;
-    private LocalDateTime exitTime;
+    private long entryTime; 
+    private long exitTime; 
+
     private double fee;
     private boolean isActive;
 
-    public ParkingTransaction(String transactionID, LocalDateTime entryTime) {
+    // Constructor to initialize the transaction
+    public ParkingTransaction(String transactionID, long entryTime) {
         this.transactionID = transactionID;
         this.entryTime = entryTime;
         this.isActive = true; 
         this.fee = 0.0;       
     }
 
-    public void completeTransaction(LocalDateTime exitTime, double feeRate) {
+    // Method to complete the transaction
+    public void completeTransaction(long exitTime, double feeRate) {
         if (!isActive) {
             System.out.println("Transaction is already completed.");
             return;
@@ -27,31 +30,31 @@ public class ParkingTransaction {
         this.isActive = false; 
     }
 
+    // Method to calculate the fee based on the duration and fee rate
     public double calculateFee(double feeRate) {
-        long duration = getDuration(); 
-        // return Math.ceil(duration / 60.0) * feeRate;
-        return (duration / 60.0) * feeRate;
+        long durationInMinutes = getDurationInMinutes();
+        double durationInHours = durationInMinutes / 60.0; // Convert minutes to hours
+        return durationInHours * feeRate; // Round up to the nearest hour
     }
 
-    public long getDuration() {
-        if (exitTime == null) {
-            System.out.println("Exit time not set. Transaction is still active.");
-            return 0;
+    // Method to calculate the duration in minutes
+    public long getDurationInMinutes() {
+        if (exitTime <= entryTime) {
+            throw new IllegalStateException("Invalid duration: Exit time must be after entry time.");
         }
-        return Duration.between(entryTime, exitTime).toMinutes();
+        return (exitTime - entryTime) / (1000 * 60); // Convert milliseconds to minutes
     }
 
     // Method to get transaction details as a formatted string
     public String getTransactionDetails() {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         StringBuilder details = new StringBuilder();
         details.append("Transaction ID: ").append(transactionID).append("\n");
-        details.append("Entry Time: ").append(entryTime.format(formatter)).append("\n");
+        details.append("Entry Time: ").append(formatTime(entryTime)).append("\n");
 
-        if (exitTime != null) {
-            details.append("Exit Time: ").append(exitTime.format(formatter)).append("\n");
-        } else {
+        if (isActive) {
             details.append("Exit Time: Not set (transaction still active)\n");
+        } else {
+            details.append("Exit Time: ").append(formatTime(exitTime)).append("\n");
         }
 
         details.append("Fee: $").append(String.format("%.2f", fee)).append("\n");
@@ -59,15 +62,24 @@ public class ParkingTransaction {
         return details.toString();
     }
 
+    // Helper method to format epoch time to human-readable string
+    private String formatTime(long timeMillis) {
+        LocalDateTime dateTime = java.time.Instant.ofEpochMilli(timeMillis)
+                                                  .atZone(ZoneId.systemDefault())
+                                                  .toLocalDateTime();
+        return dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+    }
+    
+    // Getters
     public String getTransactionID() {
         return transactionID;
     }
 
-    public LocalDateTime getEntryTime() {
+    public long getEntryTime() {
         return entryTime;
     }
 
-    public LocalDateTime getExitTime() {
+    public long getExitTime() {
         return exitTime;
     }
 
@@ -77,5 +89,5 @@ public class ParkingTransaction {
 
     public boolean isActive() {
         return isActive;
-    }  
+    }
 }

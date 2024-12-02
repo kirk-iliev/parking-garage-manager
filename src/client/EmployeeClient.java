@@ -141,20 +141,28 @@ public class EmployeeClient {
     public void handleGenerateReport() {
         try {
             String garageID = gui.getGarageIDInput();
-
+    
             if (garageID.isEmpty()) {
                 gui.displayError("Garage ID is required.");
                 return;
             }
-
+    
             String request = "GENERATE_REPORT:" + garageID;
             sendRequest(request);
-            receiveResponse();
-        } catch (Exception e) {
+    
+            StringBuilder responseBuilder = new StringBuilder();
+            String line;
+            while (!(line = input.readLine()).equals("END_REPORT")) {
+                responseBuilder.append(line).append("\n");
+            }
+            String report = responseBuilder.toString();
+    
+            gui.displayReport(report); // Display the report in the GUI
+        } catch (IOException e) {
             gui.displayError("Error handling 'Generate Report': " + e.getMessage());
         }
     }
-
+    
     // Parse time from string to milliseconds
     private long parseTime(String timeStr) throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
@@ -164,6 +172,6 @@ public class EmployeeClient {
 
     public static void main(String[] args) {
         EmployeeClient client = new EmployeeClient("localhost", 12345);
-        client.gui.setVisible(true); // Show the GUI
+        client.gui.setVisible(true); 
     }
 }
