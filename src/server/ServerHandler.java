@@ -1,5 +1,8 @@
 import java.io.*;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.*;
 
 public class ServerHandler {
@@ -77,9 +80,16 @@ public class ServerHandler {
 
     // Process incoming requests
     private void processRequest(String request, PrintWriter output) {
+        if (request == null || request.trim().isEmpty()) {
+            output.println("ERROR:Empty or null request");
+            return;
+        }
         String[] parts = request.split(":");
+        if (parts.length < 2) {
+            output.println("ERROR:Invalid request format");
+            return;
+        }
         String action = parts[0];
-
         switch (action) {
             case "PARK_CAR":
                 handleParkCarRequest(parts, output);
@@ -94,51 +104,62 @@ public class ServerHandler {
                 output.println("ERROR:Invalid action");
         }
     }
+    
 
     // Handle 'PARK_CAR' request
     private void handleParkCarRequest(String[] parts, PrintWriter output) {
-        try {
-            String entryTimeStr = parts[1];
-            String garageID = parts[2];
-            Date entryTime = new Date(Long.parseLong(entryTimeStr));
-            ParkingGarage garage = getGarageByID(garageID);
+    try {
+        String entryTimeStr = parts[1];
+        String garageID = parts[2];
+        LocalDateTime entryTime = LocalDateTime.ofEpochSecond(Long.parseLong(entryTimeStr) / 1000, 0, ZoneOffset.UTC);
+        ParkingGarage garage = getGarageByID(garageID);
 
-            if (garage != null) {
-                String transactionID = garage.parkCar(entryTime);
+        if (garage != null) {
+            String transactionID = garage.parkCar(entryTime);
+            if (transactionID != null) {
                 output.println("PARK_CAR_SUCCESS:" + transactionID);
             } else {
-                output.println("ERROR:Garage not found");
+                output.println("ERROR:Transaction list is full.");
             }
-        } catch (Exception e) {
-            output.println("ERROR:" + e.getMessage());
+        } else {
+            output.println("ERROR:Garage not found");
         }
+    } catch (Exception e) {
+        output.println("ERROR:" + e.getMessage());
     }
+}
+
 
     // Handle 'REMOVE_CAR' request
     private void handleRemoveCarRequest(String[] parts, PrintWriter output) {
-        try {
-            String transactionID = parts[1];
-            String exitTimeStr = parts[2];
-            String garageID = parts[3];
-            Date exitTime = new Date(Long.parseLong(exitTimeStr));
-            ParkingGarage garage = getGarageByID(garageID);
+    try {
+        String transactionID = parts[1];
+        String exitTimeStr = parts[2];
+        String garageID = parts[3];
+        Date exitTimeDate = new Date(Long.parseLong(exitTimeStr));
+        LocalDateTime exitTime = exitTimeDate.toInstant()
+                                             .atZone(ZoneId.systemDefault())
+                                             .toLocalDateTime();
 
-            if (garage != null) {
-                boolean success = garage.removeCar(transactionID, exitTime);
-                if (success) {
-                    ParkingTransaction transaction = garage.getTransaction(transactionID);
-                    double fee = transaction.getFee();
-                    output.println("REMOVE_CAR_SUCCESS:" + fee);
-                } else {
-                    output.println("ERROR:Transaction not found or already completed");
-                }
+        ParkingGarage garage = getGarageByID(garageID);
+
+        if (garage != null) {
+            boolean success = garage.removeCar(transactionID, exitTime);
+            if (success) {
+                ParkingTransaction transaction = garage.getTransaction(transactionID);
+                double fee = transaction.getFee();
+                output.println("REMOVE_CAR_SUCCESS:" + fee);
             } else {
-                output.println("ERROR:Garage not found");
+                output.println("ERROR:Transaction not found or already completed");
             }
-        } catch (Exception e) {
-            output.println("ERROR:" + e.getMessage());
+        } else {
+            output.println("ERROR:Garage not found");
         }
+    } catch (Exception e) {
+        output.println("ERROR:" + e.getMessage());
     }
+}
+
 
     // Handle 'GENERATE_REPORT' request
     private void handleGenerateReportRequest(String[] parts, PrintWriter output) {
@@ -179,11 +200,8 @@ public class ServerHandler {
 
     public static void main(String[] args) {
         int port = 12345; // Port number for the server
-        try {
-            ServerHandler server = new ServerHandler(port);
-            server.startServer();
-        } catch (IOException e) {
-            System.err.println("Failed to start server: " + e.getMessage());
-        }
+        ServerHandler server = new ServerHandler(port);
+        server.startServer();
     }
+    
 }
