@@ -28,7 +28,7 @@ public class ServerHandler {
     private void initializeParkingGarages() {
         
         parkingGarages.put("G1", new ParkingGarage("G1", 2.5, 100));
-        parkingGarages.put("G2", new ParkingGarage("G2", 3.0, 150));
+        parkingGarages.put("G2", new ParkingGarage("G2", 3.0, 5));
     }
 
     // Start accepting client connections
@@ -120,6 +120,11 @@ public class ServerHandler {
     
             ParkingGarage garage = getGarageByID(garageID);
             if (garage != null) {
+            	
+            	if (garage.getAvailableSpace() <= 0) {
+            		output.println("ERROR:Garage is full");
+            		return;
+            	}
                 String transactionID = garage.parkCar(entryTimeMillis);
                 output.println("PARK_CAR_SUCCESS:" + transactionID);
             } else {
