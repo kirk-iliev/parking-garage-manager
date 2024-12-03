@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.net.InetAddress;
 
 public class ServerHandler {
 
@@ -10,18 +11,20 @@ public class ServerHandler {
 
     public ServerHandler(int port) {
         try {
-            // Bind to 0.0.0.0 to listen on all network interfaces
             serverSocket = new ServerSocket();
             serverSocket.bind(new InetSocketAddress("0.0.0.0", port));
-
+            
+            // Print the server's IP address and port
+            System.out.println("Server started on IP: " + InetAddress.getLocalHost().getHostAddress() + ", Port: " + port);
+            
             clientSockets = new ArrayList<>();
             parkingGarages = new HashMap<>();
             initializeParkingGarages();
-            System.out.println("Server initialized on 0.0.0.0, port: " + port);
         } catch (IOException e) {
             System.err.println("Failed to start server: " + e.getMessage());
         }
     }
+
 
     private void initializeParkingGarages() {
         parkingGarages.put("G1", new ParkingGarage("G1", 2.5, 100));

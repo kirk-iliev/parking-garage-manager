@@ -3,6 +3,7 @@ import java.net.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Scanner;
 
 public class EmployeeClient {
 
@@ -171,7 +172,17 @@ public class EmployeeClient {
     }
 
     public static void main(String[] args) {
-        EmployeeClient client = new EmployeeClient("localhost", 12345);
-        client.gui.setVisible(true); 
+        Scanner scanner = new Scanner(System.in);
+        
+        System.out.print("Enter the server IP address: ");
+        String serverAddress = scanner.nextLine().trim();
+        
+        System.out.print("Enter the server port (default 12345): ");
+        String portInput = scanner.nextLine().trim();
+        int serverPort = portInput.isEmpty() ? 12345 : Integer.parseInt(portInput);
+        
+        EmployeeClient client = new EmployeeClient(serverAddress, serverPort);
+        client.gui.setVisible(true);
+        scanner.close();
     }
 }
