@@ -9,6 +9,7 @@ public class ClientGUI extends JFrame {
     private JTextField entryTimeField;
     private JTextField exitTimeField;
     private JTextField transactionIDField;
+    private JTextField paymentField;
     private JTextField garageIDField;
     private JTextArea outputArea;
 
@@ -27,9 +28,10 @@ public class ClientGUI extends JFrame {
         entryTimeField = new JTextField();
         exitTimeField = new JTextField();
         transactionIDField = new JTextField();
+        paymentField = new JTextField();
         garageIDField = new JTextField();
 
-        JPanel inputPanel = new JPanel(new GridLayout(4, 2, 10, 10));
+        JPanel inputPanel = new JPanel(new GridLayout(5, 2, 10, 10));
         inputPanel.setBorder(BorderFactory.createTitledBorder("Input Fields"));
         inputPanel.add(new JLabel("Entry Time (yyyy-MM-dd HH:mm):"));
         inputPanel.add(entryTimeField);
@@ -37,6 +39,8 @@ public class ClientGUI extends JFrame {
         inputPanel.add(exitTimeField);
         inputPanel.add(new JLabel("Transaction ID:"));
         inputPanel.add(transactionIDField);
+        inputPanel.add(new JLabel("Payment:"));
+        inputPanel.add(paymentField);
         inputPanel.add(new JLabel("Garage ID:"));
         inputPanel.add(garageIDField);
         add(inputPanel, BorderLayout.NORTH);
