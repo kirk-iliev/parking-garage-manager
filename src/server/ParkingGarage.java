@@ -1,3 +1,6 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class ParkingGarage {
 	
 	// All class attributes
@@ -81,9 +84,16 @@ public class ParkingGarage {
 	}
 
 	// In ParkingGarage class
-	public ParkingTransaction[] getTransactionList() {
-    	return this.transactionList;
+	public List<ParkingTransaction> getTransactionList() {
+		List<ParkingTransaction> activeTransactions = new ArrayList<>();
+		for (ParkingTransaction transaction : transactionList) {
+			if (transaction != null) {
+				activeTransactions.add(transaction);
+			}
+		}
+		return activeTransactions;
 	}
+
 
 	public int getGarageID() {
     	return this.garageID;

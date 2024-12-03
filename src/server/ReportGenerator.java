@@ -1,3 +1,5 @@
+import java.util.List;
+
 public class ReportGenerator {
 
     // Generate report for a specific parking garage
@@ -11,16 +13,14 @@ public class ReportGenerator {
         report.append("Number of Active Transactions: ").append(garage.getActiveTransactions()).append("\n");
         report.append("Number of Completed Transactions: ").append(garage.getNumOfTransactions()).append("\n");
 
-        // Append transactions details
+        // Append transaction details
         report.append("\n---- Transaction Details ----\n");
-        ParkingTransaction[] transactions = garage.getTransactionList();
-        if (transactions == null || transactions.length == 0) {
+        List<ParkingTransaction> transactions = garage.getTransactionList();
+        if (transactions.isEmpty()) { // Check if the list is empty
             report.append("No transactions recorded.\n");
         } else {
             for (ParkingTransaction transaction : transactions) {
-                if (transaction != null) {
-                    report.append(transaction.getTransactionDetails()).append("\n");
-                }
+                report.append(transaction.getTransactionDetails()).append("\n");
             }
         }
         report.append("-----------------------------\n");

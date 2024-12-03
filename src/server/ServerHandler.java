@@ -16,10 +16,13 @@ public class ServerHandler {
             clientSockets = new ArrayList<>();
             parkingGarages = new HashMap<>();
             initializeParkingGarages();
+            System.out.println("Server initialized on port: " + port);
         } catch (IOException e) {
             System.err.println("Failed to start server: " + e.getMessage());
+            serverSocket = null; // Explicitly set to null for clarity
         }
     }
+    
 
     // Initialize parking garages 
     private void initializeParkingGarages() {
@@ -30,9 +33,14 @@ public class ServerHandler {
 
     // Start accepting client connections
     public void startServer() {
+        if (serverSocket == null) {
+            System.err.println("Cannot start server: ServerSocket is not initialized.");
+            return;
+        }
         System.out.println("Server started. Waiting for clients...");
         acceptConnections();
     }
+    
 
     // Accept new client connections
     private void acceptConnections() {
