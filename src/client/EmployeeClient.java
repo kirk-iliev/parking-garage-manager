@@ -13,6 +13,7 @@ public class EmployeeClient {
     private BufferedReader input;
     private PrintWriter output;
     private String serverAddress;
+    private String status;
     private int serverPort;
 
     // Constructor
@@ -20,6 +21,7 @@ public class EmployeeClient {
         this.serverAddress = serverAddress;
         this.serverPort = serverPort;
         this.gui = new ClientGUI(this);
+        status = "disconnected";
         connectToServer();
     }
 
@@ -30,6 +32,7 @@ public class EmployeeClient {
             input = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             output = new PrintWriter(socket.getOutputStream(), true);
             gui.updateStatus("Connected to server");
+            status = "connected";
         } catch (IOException e) {
             gui.displayError("Connection failed: " + e.getMessage());
         }
@@ -88,6 +91,7 @@ public class EmployeeClient {
             if (input != null) input.close();
             if (output != null) output.close();
             gui.updateStatus("Disconnected from server");
+            status = "disconnected";
         } catch (IOException e) {
             gui.displayError("Error during disconnection: " + e.getMessage());
         }
@@ -162,6 +166,11 @@ public class EmployeeClient {
         } catch (IOException e) {
             gui.displayError("Error handling 'Generate Report': " + e.getMessage());
         }
+    }
+    
+    public String getStatus()
+    {
+    	return status;
     }
     
     // Parse time from string to milliseconds

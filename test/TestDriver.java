@@ -7,7 +7,8 @@ public class TestDriver {
         System.out.println("Running tests...");
         
         // Run ParkingGarageTest
-        Result result = JUnitCore.runClasses(ParkingGarageTest.class, ParkingTransactionTest.class, ReportGeneratorTest.class);
+        Result result = JUnitCore.runClasses(ParkingGarageTest.class, ParkingTransactionTest.class, 
+        		ReportGeneratorTest.class, EmployeeClientTest.class);
 
         // Print results
         for (Failure failure : result.getFailures()) {
