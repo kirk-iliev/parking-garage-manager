@@ -4,34 +4,30 @@ import java.util.*;
 
 public class ServerHandler {
 
-    // Attributes
     private ServerSocket serverSocket;
     private List<Socket> clientSockets;
     private Map<String, ParkingGarage> parkingGarages;
 
-    // Constructor
     public ServerHandler(int port) {
         try {
-            serverSocket = new ServerSocket(port);
+            // Bind to 0.0.0.0 to listen on all network interfaces
+            serverSocket = new ServerSocket();
+            serverSocket.bind(new InetSocketAddress("0.0.0.0", port));
+
             clientSockets = new ArrayList<>();
             parkingGarages = new HashMap<>();
             initializeParkingGarages();
-            System.out.println("Server initialized on port: " + port);
+            System.out.println("Server initialized on 0.0.0.0, port: " + port);
         } catch (IOException e) {
             System.err.println("Failed to start server: " + e.getMessage());
-            serverSocket = null; // Explicitly set to null for clarity
         }
     }
-    
 
-    // Initialize parking garages 
     private void initializeParkingGarages() {
-        
         parkingGarages.put("G1", new ParkingGarage("G1", 2.5, 100));
         parkingGarages.put("G2", new ParkingGarage("G2", 3.0, 5));
     }
 
-    // Start accepting client connections
     public void startServer() {
         if (serverSocket == null) {
             System.err.println("Cannot start server: ServerSocket is not initialized.");
@@ -40,9 +36,7 @@ public class ServerHandler {
         System.out.println("Server started. Waiting for clients...");
         acceptConnections();
     }
-    
 
-    // Accept new client connections
     private void acceptConnections() {
         while (true) {
             try {
